@@ -1,0 +1,49 @@
+<%- include('partials/header'); -%>
+
+<header>
+ 
+  <div class="content">
+    <input type="text" id="longUrl" class="url-input" placeholder="Enter the URL to shorten">
+    <input type="text" id="customAlias" class="url-input" placeholder="Enter any custom alias (Optional)">
+    <input type="text" id="topic" class="url-input" placeholder="Enter the topic">
+    <button class="shorten-btn">Shorten URL</button>
+  
+</div>
+
+
+
+<%- include('partials/footer'); -%>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.shorten-btn').on('click', function () {
+
+      const urlInput = $('#longUrl').val();
+      const customInput = $('#customAlias').val();
+      const topicInput = $('#topic').val();
+      if (!urlInput) {
+        alert('Please enter a URL');
+        return;
+      }
+
+      $.ajax({
+        url: '/api/shorten',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ longUrl: urlInput,customAlias:customInput,topic:topicInput }),
+        success: function (response) {
+          $('#result').text(`Shortened URL: ${response.shortenedUrl}`);
+        },
+        error: function (xhr, status, error) {
+            if (xhr.status === 401) {
+                // If the server responds with 401, redirect to login
+                window.location.href = '/login';  // Redirect to login page
+            } else {
+                console.error(error);
+                alert('Something went wrong!');
+            }
+        },
+      });
+    });
+  });
+</script>
