@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const urlRoutes = require('./routes/urlRoutes');
+const useragent = require('express-useragent');
 const cookieParser = require('cookie-parser');
 const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 require('dotenv').config();
@@ -12,6 +13,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(useragent.express());
 app.use(authRoutes);
 app.use(urlRoutes);
 
