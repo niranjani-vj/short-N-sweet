@@ -7,7 +7,7 @@ const router = Router();
 
 
 router.route('/api/shorten/:shortUrl')
-  .get(urlController.fetch_url); 
+  .get(checkUser,urlController.fetch_url); 
 
 router.route('/api/shorten')
   .post(checkUser, urlController.api_shortener);  

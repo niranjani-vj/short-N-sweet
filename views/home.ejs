@@ -33,6 +33,7 @@
         data: JSON.stringify({ longUrl: urlInput,customAlias:customInput,topic:topicInput }),
         success: function (response) {
           $('#result').text(`Shortened URL: ${response.shortenedUrl}`);
+          
         },
         error: function (xhr, status, error) {
             if (xhr.status === 401) {
