@@ -4,6 +4,7 @@ const authRoutes = require('./routes/authRoutes');
 const urlRoutes = require('./routes/urlRoutes');
 const useragent = require('express-useragent');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 require('dotenv').config();
 const app = express();
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use(useragent.express());
 app.use(authRoutes);
 app.use(urlRoutes);
+app.use(cors());
 
 // view engine
 app.set('view engine', 'ejs');

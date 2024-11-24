@@ -7,8 +7,8 @@
     <input type="text" id="customAlias" class="url-input" placeholder="Enter any custom alias (Optional)">
     <input type="text" id="topic" class="url-input" placeholder="Enter the topic">
     <button class="shorten-btn">Shorten URL</button>
-  
-</div>
+    <p id="result"></p>
+  </div>
 
 
 
@@ -32,7 +32,7 @@
         contentType: 'application/json',
         data: JSON.stringify({ longUrl: urlInput,customAlias:customInput,topic:topicInput }),
         success: function (response) {
-          $('#result').text(`Shortened URL: ${response.shortenedUrl}`);
+          $('#result').text(`Shortened URL: ${response.shortUrl}`);
           
         },
         error: function (xhr, status, error) {

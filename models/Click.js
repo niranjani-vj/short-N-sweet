@@ -5,6 +5,12 @@ const clickSchema = new mongoose.Schema(
     short_id: { 
       type: String, 
       required: true, 
+      index: true,  
+    },
+    topic:{
+      type: String,
+      required: true, 
+      index: true,  
     },
     user_id: {
       type: String,
@@ -50,13 +56,16 @@ const clickSchema = new mongoose.Schema(
         $group: {
           _id: null, // Group all matching documents together
           totalClicks: { $sum: 1 }, // Count total documents
-          uniqueUsers: { $addToSet: "$user_id" } // Collect unique user IDs into a set
+          uniqueUsers: { $addToSet: "$user_id" }, // Collect unique user IDs into a set
+          totalUrls: { $addToSet: "$short_id" }
         }
       },
       {
         $project: {
           totalClicks: 1, // Include totalClicks in the output
-          uniqueUsers: { $size: "$uniqueUsers" } // Calculate the size of the unique user set
+          uniqueUsers: { $size: "$uniqueUsers" }, // Calculate the size of the unique user set
+          totalUrls: { $size: "$totalUrls" },
+          _id: 0
         }
       }
     ])
@@ -92,36 +101,39 @@ const clickSchema = new mongoose.Schema(
     ]);
   };    
 
-  //OsType
-  clickSchema.statics.getOsClickDetails = async function (conditionColumn,conditionValue) {
+  //OsType && DeviceType
+  clickSchema.statics.getTypeClickDetails = async function (conditionColumn,conditionValue,conditionType) {
     const matchConditon = {};
     matchConditon[conditionColumn] = conditionValue;
+    if(conditionType == "$os_type"){
+      projectName = "osName";
+    }else if (conditionType == "$device_type"){
+      projectName = "deviceType";
+    }else if(conditionType == "$short_id"){
+      projectName = "shortUrl";
+    }
     return this.aggregate([
       {
         $match: matchConditon, 
       },
       {
         $group: {
-          _id: "$os_type", // Group all matching documents together
+          _id:conditionType, // Group all matching documents together
           uniqueClicks: { $sum: 1 }, // Count total documents
           uniqueUsers: { $addToSet: "$user_id" } // Collect unique user IDs into a set
         }
       },
       {
         $project: {
-          osName:"$_id",
+          [projectName]:"$_id",
           totalClicks: "$uniqueClicks", // Include totalClicks in the output
           uniqueUsers: { $size: "$uniqueUsers" },
           _id:0
         }
       }
     ]);
-  };  
+  }; 
 
-
-  //DeviceType
-
-  //response together 
 
 
 const Click = mongoose.model('Click', clickSchema);

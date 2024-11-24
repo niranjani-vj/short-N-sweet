@@ -12,5 +12,13 @@ router.route('/api/shorten/:shortUrl')
 router.route('/api/shorten')
   .post(checkUser, urlController.api_shortener);  
 
+  router.route('/api/analytics/:shortUrl')
+  .get(checkUser,urlController.analytics_short_url); 
+  
+  router.route('/api/analytics/topic/:topicName')
+  .get(checkUser,urlController.analytics_topic); 
+  
+  router.route('/api/analytics/overall/:id')
+  .get(checkUser,urlController.analytics_overall); 
 
 module.exports = router;

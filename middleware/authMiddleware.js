@@ -46,7 +46,6 @@ const checkUser = (req, res, next) => {
       });
   } else {
       console.log('No token found, res.locals.user set to:', res.locals.user);
-  
       next();
   }
 };
