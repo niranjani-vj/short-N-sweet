@@ -1,6 +1,8 @@
+const redisClient = require('../config/redis');
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const dotenv = require('dotenv');  // Load environment variables
+const dotenv = require('dotenv');  
 dotenv.config();
 
 if (!jwt) {
@@ -50,5 +52,33 @@ const checkUser = (req, res, next) => {
   }
 };
 
+// Rate limiting middleware
+const rateLimiter = async (req, res, next) => {
 
-  module.exports = { requireAuth, checkUser };
+
+  const userId = res.locals.user.google_id;
+  const redisKey = `rate-limit:${userId}`;
+
+  try {
+    const requestCount = await redisClient.incr(redisKey);
+    const ttl = await redisClient.ttl(redisKey);
+    if (ttl === -1) {
+      // Set expiration if not already set
+      await redisClient.expire(redisKey, 60);
+    }
+    
+    if (requestCount > 5) {
+      const timeLeft = await redisClient.ttl(redisKey);
+      return res.status(429).json({
+        message: `Rate limit exceeded. Try again in ${timeLeft} seconds.`,
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error('Rate limiter error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+  module.exports = { requireAuth, checkUser, rateLimiter };
