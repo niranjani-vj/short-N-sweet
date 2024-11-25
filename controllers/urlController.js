@@ -1,5 +1,7 @@
+const redisClient = require('../config/redis');
 const Link = require('../models/Link');
 const Click = require('../models/Click');
+
 const shortid = require('shortid');
 const axios = require('axios');
 
@@ -39,6 +41,8 @@ module.exports.api_shortener = async (req, res) => {
             topic: topic,
             createAt:new Date()
         });
+        const keys = await redisClient.keys('analytics:*');
+        await Promise.all(keys.map((key) => redisClient.del(key)));
         res.status(201).json({ shortUrl: newLink.short_id,createdAt:newLink.createAt });
     } catch (error) {
         console.error('Error creating short link:', error);
@@ -101,7 +105,10 @@ module.exports.fetch_url = async (req, res) => {
                         latitude:latitude,
                         longitude:longitude
                     }
-                 });
+                });
+                const keys = await redisClient.keys('analytics:*');
+                await Promise.all(keys.map((key) => redisClient.del(key)));
+
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -123,11 +130,17 @@ module.exports.analytics_short_url = async (req, res) => {
     }
 
     try {
+        const cacheKey = `analytics:shortUrl:${shortUrl}`;
+        // Check the cache first
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json(JSON.parse(cachedData)); // Return cached data
+        }
         // Run all async operations concurrently
         const [clickCounts, clickByDate, clickOsTypeCount, clickDeviceTypeCount] = await Promise.all([
             //totalClicks & uniqueUsers
             Click.getClickCounts(searchBy, shortUrl), 
-            //clickByDate
+            //clickByDate 
             Click.getClicksByDateDetails(searchBy, shortUrl, 7),
             //osType
             Click.getTypeClickDetails(searchBy, shortUrl, '$os_type'),
@@ -139,14 +152,18 @@ module.exports.analytics_short_url = async (req, res) => {
         const totalClicks = clickCounts?.[0]?.totalClicks || 0;
         const uniqueUsers = clickCounts?.[0]?.uniqueUsers || 0;
 
-        // Respond with all results
-        res.status(200).json({
+        let responseData = {
             totalClicks,
             uniqueUsers,
             clickByDate: clickByDate || [],
             clickOsTypeCount: clickOsTypeCount || [],
             clickDeviceTypeCount: clickDeviceTypeCount || [],
-        });
+        };
+         // Cache the result with a timeout of 1 hour
+         await redisClient.set(cacheKey, JSON.stringify(responseData), { EX: 3600 });
+
+        // Respond with all results
+        res.status(200).json(responseData);
     } catch (error) {
         console.error('Error in analytics_short_url:', error);
 
@@ -165,6 +182,12 @@ module.exports.analytics_topic = async (req, res) => {
     }
 
     try {
+        const cacheKey = `analytics:topic:${topicName}`;
+        // Check the cache first
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json(JSON.parse(cachedData)); // Return cached data
+        }
         // Run all async operations concurrently
         const [clickCounts, clickByDate, clickShortUrlCount] = await Promise.all([
             //totalClicks & uniqueUsers
@@ -179,13 +202,16 @@ module.exports.analytics_topic = async (req, res) => {
         const totalClicks = clickCounts?.[0]?.totalClicks || 0;
         const uniqueUsers = clickCounts?.[0]?.uniqueUsers || 0;
 
-        // Respond with all results
-        res.status(200).json({
+        let responseData = {
             totalClicks,
             uniqueUsers,
             clickByDate: clickByDate || [],
             urls: clickShortUrlCount || [],
-        });
+        }
+
+        await redisClient.set(cacheKey, JSON.stringify(responseData), { EX: 3600 });
+        // Respond with all results
+        res.status(200).json(responseData);
     } catch (error) {
         console.error('Error in analytics_short_url:', error);
 
@@ -206,6 +232,12 @@ module.exports.analytics_overall = async (req, res) => {
     }
 
     try {
+        const cacheKey = `analytics:user:${userId}`;
+        // Check the cache first
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json(JSON.parse(cachedData)); // Return cached data
+        }
         // Run all async operations concurrently
         const [clickCounts, clickByDate, clickOsTypeCount, clickDeviceTypeCount] = await Promise.all([
             //totalClicks & uniqueUsers
@@ -223,15 +255,19 @@ module.exports.analytics_overall = async (req, res) => {
         const totalClicks = clickCounts?.[0]?.totalClicks || 0;
         const uniqueUsers = clickCounts?.[0]?.uniqueUsers || 0;
 
-        // Respond with all results
-        res.status(200).json({
+        let responseData = {
             totalUrls,
             totalClicks,
             uniqueUsers,
             clickByDate: clickByDate || [],
             clickOsTypeCount: clickOsTypeCount || [],
             clickDeviceTypeCount: clickDeviceTypeCount || [],
-        });
+        };
+
+        await redisClient.set(cacheKey, JSON.stringify(responseData), { EX: 3600 });
+
+        // Respond with all results
+        res.status(200).json(responseData);
     } catch (error) {
         console.error('Error in analytics_short_url:', error);
 

@@ -14,7 +14,9 @@
     "loader": "^2.1.1",
     "mongoose": "^8.8.2",
     "nodemon": "^3.1.7",
-    "shortid": "^2.2.16"
+    "redis": "^4.7.0",
+    "shortid": "^2.2.16",
+    "util": "^0.12.5"
   },
   "name": "y",
   "version": "1.0.0",
