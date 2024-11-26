@@ -35,7 +35,7 @@ module.exports.api_shortener = async (req, res) => {
         }
 
         let newLink = await Link.create({
-            short_id: shortLink,
+            short_id: shortLink.toLowerCase(),
             link: longUrl,
             user_id:userId,
             topic: topic,
@@ -239,7 +239,11 @@ module.exports.analytics_overall = async (req, res) => {
             return res.status(200).json(JSON.parse(cachedData)); // Return cached data
         }
         // Run all async operations concurrently
-        const [clickCounts, clickByDate, clickOsTypeCount, clickDeviceTypeCount] = await Promise.all([
+        const [totalUrlsResult,clickCounts, clickByDate, clickOsTypeCount, clickDeviceTypeCount] = await Promise.all([
+             Link.aggregate([
+                { $match: { user_id: userId } },
+                { $count: "totalUrls" }
+              ]),
             //totalClicks & uniqueUsers
             Click.getClickCounts(searchBy, userId), 
             //clickByDate
@@ -247,11 +251,12 @@ module.exports.analytics_overall = async (req, res) => {
             //osType
             Click.getTypeClickDetails(searchBy, userId, '$os_type'),
             //deviceType
-            Click.getTypeClickDetails(searchBy, userId, '$device_type'),
+            Click.getTypeClickDetails(searchBy, userId, '$device_type')
+
         ]);
 
         // Handle potential empty results gracefully
-        const totalUrls = clickCounts?.[0]?.totalUrls || 0;
+        const totalUrls = totalUrlsResult.length > 0 ? totalUrlsResult[0].totalUrls : 0;
         const totalClicks = clickCounts?.[0]?.totalClicks || 0;
         const uniqueUsers = clickCounts?.[0]?.uniqueUsers || 0;
 
@@ -261,7 +266,7 @@ module.exports.analytics_overall = async (req, res) => {
             uniqueUsers,
             clickByDate: clickByDate || [],
             clickOsTypeCount: clickOsTypeCount || [],
-            clickDeviceTypeCount: clickDeviceTypeCount || [],
+            clickDeviceTypeCount: clickDeviceTypeCount || []
         };
 
         await redisClient.set(cacheKey, JSON.stringify(responseData), { EX: 3600 });

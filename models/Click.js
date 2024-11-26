@@ -56,15 +56,13 @@ const clickSchema = new mongoose.Schema(
         $group: {
           _id: null, // Group all matching documents together
           totalClicks: { $sum: 1 }, // Count total documents
-          uniqueUsers: { $addToSet: "$user_id" }, // Collect unique user IDs into a set
-          totalUrls: { $addToSet: "$short_id" }
+          uniqueUsers: { $addToSet: "$user_id" }
         }
       },
       {
         $project: {
           totalClicks: 1, // Include totalClicks in the output
-          uniqueUsers: { $size: "$uniqueUsers" }, // Calculate the size of the unique user set
-          totalUrls: { $size: "$totalUrls" },
+          uniqueUsers: { $size: "$uniqueUsers" },
           _id: 0
         }
       }
