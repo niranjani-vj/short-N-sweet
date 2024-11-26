@@ -32,7 +32,7 @@
         contentType: 'application/json',
         data: JSON.stringify({ longUrl: urlInput,customAlias:customInput,topic:topicInput }),
         success: function (response) {
-          $('#result').text(`Shortened URL: ${response.shortUrl}`);
+          $('#result').text(`Shortened URL: https://shortandsweet.onrender.com/api/shorten/${response.shortUrl}`);
           
         },
         error: function (xhr, status, error) {
