@@ -10,8 +10,6 @@ module.exports.api_shortener = async (req, res) => {
 
     // Check if user is authenticated
     if (!res.locals.user) {
-        console.log('User not authenticated, redirecting to login');
-        
         // If it's an API request, return 401 instead of redirecting
         return res.status(401).json({ message: 'Unauthorized. Please log in.' });
     }
@@ -53,7 +51,6 @@ module.exports.fetch_url = async (req, res) => {
 
     // Check if user is authenticated
     if (res.locals.user) {
-        console.log('User not authenticated, redirecting to login');
         var userId = res.locals.user.google_id||null; 
     }
     try {
@@ -172,6 +169,43 @@ module.exports.analytics_short_url = async (req, res) => {
     }
 };
 
+module.exports.get_topic_page = (req, res) => {
+    res.render('analytics_topic');
+}
+module.exports.get_url_page = (req, res) => {
+    res.render('analytics_url');
+}
+module.exports.manage_url_page = (req, res) => {
+    res.render('short_urls');
+}
+
+
+
+  module.exports.fetch_topics =  async (req, res) => {
+    try {
+      const userId = res.locals.user.google_id || null;
+      // Fetch unique topics for the given userId
+      const topics = await Link.distinct('topic', { user_id: userId });
+        
+      res.status(200).json({ topics });
+    } catch (err) {
+      console.error('Error fetching topics:', err);
+      res.status(500).json({ error: 'Failed to fetch topics' });
+    }
+  }
+  module.exports.fetch_urls=  async (req, res) => {
+    try {
+      const userId = res.locals.user.google_id || null;
+      // Fetch unique topics for the given userId
+      const urls = await Link.distinct('short_id', { user_id: userId });
+        
+      res.status(200).json({ urls });
+    } catch (err) {
+      console.error('Error fetching urls:', err);
+      res.status(500).json({ error: 'Failed to fetch urls' });
+    }
+  }
+
 module.exports.analytics_topic = async (req, res) => {
     const searchBy = 'topic';
     const topicName = req.params.topicName;
@@ -182,6 +216,7 @@ module.exports.analytics_topic = async (req, res) => {
     }
 
     try {
+        var userId = res.locals.user.google_id || null;
         const cacheKey = `analytics:topic:${topicName}`;
         // Check the cache first
         const cachedData = await redisClient.get(cacheKey);
@@ -195,7 +230,7 @@ module.exports.analytics_topic = async (req, res) => {
             //clickByDate
             Click.getClicksByDateDetails(searchBy, topicName, 7),
             //osType
-            Click.getTypeClickDetails(searchBy, topicName, '$short_id'),
+            Click.getTopicUrlDetails(searchBy, topicName, '$short_id',userId),
         ]);
 
         // Handle potential empty results gracefully
@@ -222,13 +257,13 @@ module.exports.analytics_topic = async (req, res) => {
 
 module.exports.analytics_overall = async (req, res) => {
     if (res.locals.user) {
-        var userId = res.locals.user.google_id || req.params.id || false; 
+        var userId = res.locals.user.google_id || false; 
     }
     const searchBy = 'user_id';
 
     // Validate the input
     if (!userId) {
-        return res.status(400).json({ error: "Please login with Google" });
+        return  res.redirect('/login');
     }
 
     try {
@@ -236,7 +271,8 @@ module.exports.analytics_overall = async (req, res) => {
         // Check the cache first
         const cachedData = await redisClient.get(cacheKey);
         if (cachedData) {
-            return res.status(200).json(JSON.parse(cachedData)); // Return cached data
+            const responseData = JSON.parse(cachedData);
+            return res.render('analytics_overall', { data: responseData, userid: userId });
         }
         // Run all async operations concurrently
         const [totalUrlsResult,clickCounts, clickByDate, clickOsTypeCount, clickDeviceTypeCount] = await Promise.all([
@@ -272,7 +308,7 @@ module.exports.analytics_overall = async (req, res) => {
         await redisClient.set(cacheKey, JSON.stringify(responseData), { EX: 3600 });
 
         // Respond with all results
-        res.status(200).json(responseData);
+        res.render('analytics_overall', { data:responseData, userid:userId });
     } catch (error) {
         console.error('Error in analytics_short_url:', error);
 
@@ -280,3 +316,43 @@ module.exports.analytics_overall = async (req, res) => {
         res.status(500).json({ error: "An error occurred while processing the analytics data." });
     }
 };
+
+//get
+module.exports.fetch_url_details = async (req, res) => {
+    const user_id =  res.locals.user.google_id || false; 
+    try {
+      const links = await Link.find({ user_id: user_id });
+      res.status(200).json(links);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+//update
+module.exports.update_url_details =
+async (req, res) => {
+    try {
+      const { link, topic } = req.body;
+      const updatedLink = await Link.findOneAndUpdate(
+        { short_id: req.params.short_id },
+        { link, topic },
+        { new: true }
+      );
+      if (!updatedLink) return res.status(404).json({ error: 'Link not found' });
+      res.status(200).json({ message: 'Link updated successfully', link: updatedLink });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+//delete
+module.exports.delete_url_details =
+async (req, res) => {
+    try {
+      const deletedLink = await Link.findOneAndDelete({ short_id: req.params.short_id });
+      if (!deletedLink) return res.status(404).json({ error: 'Link not found' });
+      res.status(200).json({ message: 'Link deleted successfully' });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };

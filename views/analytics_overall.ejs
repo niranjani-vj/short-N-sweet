@@ -1,0 +1,87 @@
+<%- include('partials/header'); -%>
+
+<main>
+    <section class="analytics">
+        <h2>Analytics Overview</h2>
+        <div class="analytics-content">
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Counts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Total URLs:</strong></td>
+                        <td><%= data.totalUrls %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Clicks:</strong></td>
+                        <td><%= data.totalClicks %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unique Users:</strong></td>
+                        <td><%= data.uniqueUsers %></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Click by Date</h3>
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Clicks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.clickByDate.forEach(function(item) { %>
+                        <tr>
+                            <td><%= item.clickByDate %></td>
+                            <td><%= item.totalClickCount %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+
+            <h3>Click by OS</h3>
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th>Operating System</th>
+                        <th>Total Clicks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.clickOsTypeCount.forEach(function(item) { %>
+                        <tr>
+                            <td><%= item.osName %></td>
+                            <td><%= item.totalClicks %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+
+            <h3>Click by Device</h3>
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th>Device Type</th>
+                        <th>Total Clicks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.clickDeviceTypeCount.forEach(function(item) { %>
+                        <tr>
+                            <td><%= item.deviceType %></td>
+                            <td><%= item.totalClicks %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- <%- include('partials/footer'); -%> -->

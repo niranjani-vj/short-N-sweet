@@ -1,0 +1,137 @@
+<%- include('partials/header'); -%>
+
+<main>
+    <section class="analytics">
+        <h2>Analytics by Topic</h2>
+
+        <!-- Dropdown for Topic Selection -->
+        <form id="topicForm">
+            <label for="topic">Choose a topic:</label>
+            <select id="topicDropdown" class="url-input">
+                <option value="">Select a topic</option>
+                <!-- Topics will be dynamically added here -->
+              </select>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Analytics Table -->
+        <div id="analyticsResult">
+            <!-- Table will be dynamically updated -->
+        </div>
+    </section>
+</main>
+
+<!-- <%- include('partials/footer'); -%> -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $.get(`/api/topics_list`, function(response) {
+            if (response.topics && response.topics.length > 0) {
+            const dropdown = $('#topicDropdown'); // Assuming you have a dropdown with id "topicDropdown"
+
+            // Clear the dropdown before adding new items
+            dropdown.empty();
+
+            // Add an empty option as the first option
+            dropdown.append('<option value="">Select a topic</option>');
+
+            // Loop through the topics and add them to the dropdown
+            response.topics.forEach(function(topic) {
+                dropdown.append(`<option value="${topic}">${topic}</option>`);
+            });
+            } else {
+            console.log("No topics found for this user.");
+            }
+        }).fail(function(error) {
+            console.log('Error fetching topics:', error);
+        });
+
+        // Handle Form Submission
+        $('#topicForm').on('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const topic = $('#topicDropdown').val(); // Get selected topic
+            
+            $.ajax({
+                url: `/api/analytics/topic/${topic}`,
+                method: 'GET',
+                success: function (data) {
+                    renderAnalytics(data); // Call function to render analytics
+                },
+                error: function (xhr) {
+                    $('#analyticsResult').html('<p>Error fetching data: ' + xhr.responseText + '</p>');
+                }
+            });
+        });
+
+        // Function to Render Analytics Table
+        function renderAnalytics(data) {
+
+    const html = `
+        <h3>Overall Statistics</h3>
+        <table class="analytics-table">
+            <tr>
+                <th>Total Clicks</th>
+                <td>${data.totalClicks || 0}</td>
+            </tr>
+            <tr>
+                <th>Unique Users</th>
+                <td>${data.uniqueUsers || 0}</td>
+            </tr>
+        </table>
+
+        <h3>Click by Date</h3>
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Total Clicks</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${
+                    Array.isArray(data.clickByDate)
+                        ? data.clickByDate.map(item => `
+                            <tr>
+                                <td>${item.clickByDate || 'N/A'}</td>
+                                <td>${item.totalClickCount || 0}</td>
+                            </tr>
+                        `).join('')
+                        : '<tr><td colspan="2">No data available</td></tr>'
+                }
+            </tbody>
+        </table>
+
+        <h3>URLs</h3>
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Short URL</th>
+                    <th>Total Clicks</th>
+                    <th>Unique Users</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${
+                    Array.isArray(data.urls)
+                        ? data.urls.map(url => `
+                            <tr>
+                                <td>${url.shortUrl}</td>
+                                <td>${url.totalClicks || 0}</td>
+                                <td>${url.uniqueUsers || 0}</td>
+                            </tr>
+                        `).join('')
+                        : '<tr><td colspan="3">No URLs available</td></tr>'
+                }
+            </tbody>
+        </table>
+    `;
+
+    $('#analyticsResult').html(html);
+}
+
+    });
+</script>

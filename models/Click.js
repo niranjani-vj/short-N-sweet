@@ -134,6 +134,46 @@ const clickSchema = new mongoose.Schema(
 
 
 
+  clickSchema.statics.getTopicUrlDetails = async function (conditionColumn, conditionValue, conditionType, userId) {
+    const matchCondition = {};
+    matchCondition[conditionColumn] = conditionValue;
+
+    return this.aggregate([
+        { $match: matchCondition },
+
+        {
+            $lookup: {
+                from: "links", 
+                localField: "short_id", 
+                foreignField: "short_id", 
+                as: "linkDetails",
+            },
+        },
+
+        {
+            $match: { "linkDetails.user_id": userId },
+        },
+
+        {
+            $group: {
+                _id: conditionType,
+                uniqueClicks: { $sum: 1 },
+                uniqueUsers: { $addToSet: "$user_id" },
+            },
+        },
+
+        // Reshape the output
+        {
+            $project: {
+                shortUrl: "$_id",
+                totalClicks: "$uniqueClicks",
+                uniqueUsers: { $size: "$uniqueUsers" },
+                _id: 0,
+            },
+        },
+    ]);
+};
+
 const Click = mongoose.model('Click', clickSchema);
 
 module.exports = Click;

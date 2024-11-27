@@ -1,0 +1,88 @@
+<%- include('partials/header'); -%>
+<body>
+    <h1>Manage Your Links</h1>
+    
+    <table class="links-table">
+        <thead>
+            <tr>
+                <th>Short ID</th>
+                <th>Link</th>
+                <th>Topic</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="linkTableBody">
+            <!-- Data will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Fetch links on page load
+        $(document).ready(function() {
+            // const userId = 'user123'; // Replace with the actual user ID
+
+            function fetchLinks() {
+                $.get(`/api/links`, function(links) {
+                    const tbody = $('#linkTableBody');
+                    tbody.empty(); // Clear the table before adding new rows
+                    links.forEach(link => {
+                        tbody.append(`
+                            <tr>
+                                <td>${link.short_id}</td>
+                                <td><input type="text" class="edit-link" value="${link.link}" data-id="${link.short_id}"></td>
+                                <td><input type="text" class="edit-topic" value="${link.topic}" data-id="${link.short_id}"></td>
+                                <td>
+                                    <button class="update-btn" data-id="${link.short_id}">Update</button>
+                                    <button class="delete-btn" data-id="${link.short_id}">Delete</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                });
+            }
+
+            // Call the function to fetch and display links
+            fetchLinks();
+
+            // Handle link update
+            $(document).on('click', '.update-btn', function() {
+                const short_id = $(this).data('id');
+                const link = $(this).closest('tr').find('.edit-link').val();
+                const topic = $(this).closest('tr').find('.edit-topic').val();
+
+                $.ajax({
+                    url: `/api/link/${short_id}`,
+                    method: 'PUT',
+                    data: { link, topic },
+                    success: function(response) {
+                        alert('Link updated successfully');
+                        fetchLinks(); // Re-fetch the links
+                    },
+                    error: function() {
+                        alert('Error updating link');
+                    }
+                });
+            });
+
+            // Handle link deletion
+            $(document).on('click', '.delete-btn', function() {
+                const short_id = $(this).data('id');
+
+                $.ajax({
+                    url: `/api/link/${short_id}`,
+                    method: 'DELETE',
+                    success: function(response) {
+                        alert('Link deleted successfully');
+                        fetchLinks(); // Re-fetch the links
+                    },
+                    error: function() {
+                        alert('Error deleting link');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

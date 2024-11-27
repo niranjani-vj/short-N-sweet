@@ -1,0 +1,161 @@
+<%- include('partials/header'); -%>
+
+<main>
+    <section class="analytics">
+        <h2>Analytics by Short URL</h2>
+
+        <!-- Dropdown for url Selection -->
+        <form id="urlForm">
+            <label for="url">Choose a url:</label>
+            <select id="urlDropdown" class="url-input">
+                <option value="">Select a url</option>
+                <!-- urls will be dynamically added here -->
+              </select>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Analytics Table -->
+        <div id="analyticsResult">
+            <!-- Table will be dynamically updated -->
+        </div>
+    </section>
+</main>
+
+<!-- <%- include('partials/footer'); -%> -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $.get(`/api/urls_list`, function(response) {
+            if (response.urls && response.urls.length > 0) {
+            const dropdown = $('#urlDropdown'); // Assuming you have a dropdown with id "urlDropdown"
+
+            // Clear the dropdown before adding new items
+            dropdown.empty();
+
+            // Add an empty option as the first option
+            dropdown.append('<option value="">Select a url</option>');
+
+            // Loop through the urls and add them to the dropdown
+            response.urls.forEach(function(url) {
+                dropdown.append(`<option value="${url}">${url}</option>`);
+            });
+            } else {
+            console.log("No urls found for this user.");
+            }
+        }).fail(function(error) {
+            console.log('Error fetching urls:', error);
+        });
+
+        // Handle Form Submission
+        $('#urlForm').on('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const url = $('#urlDropdown').val(); // Get selected url
+            
+            $.ajax({
+                url: `/api/analytics/${url}`,
+                method: 'GET',
+                success: function (data) {
+                    renderAnalytics(data); // Call function to render analytics
+                },
+                error: function (xhr) {
+                    $('#analyticsResult').html('<p>Error fetching data: ' + xhr.responseText + '</p>');
+                }
+            });
+        });
+
+        // Function to Render Analytics Table
+        function renderAnalytics(data) {
+
+    const html = `
+    <h3>Overall Statistics</h3>
+    <table class="analytics-table">
+        <tr>
+            <th>Total Clicks</th>
+            <td>${data.totalClicks || 0}</td>
+        </tr>
+        <tr>
+            <th>Unique Users</th>
+            <td>${data.uniqueUsers || 0}</td>
+        </tr>
+    </table>
+
+    <h3>Click by Date</h3>
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Clicks</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${
+                Array.isArray(data.clickByDate)
+                    ? data.clickByDate.map(item => `
+                        <tr>
+                            <td>${item.clickByDate || 'N/A'}</td>
+                            <td>${item.totalClickCount || 0}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="2">No data available</td></tr>'
+            }
+        </tbody>
+    </table>
+
+    <h3>Click by OS</h3>
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>OS Name</th>
+                <th>Total Clicks</th>
+                <th>Unique Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${
+                Array.isArray(data.clickOsTypeCount)
+                    ? data.clickOsTypeCount.map(item => `
+                        <tr>
+                            <td>${item.osName || 'N/A'}</td>
+                            <td>${item.totalClicks || 0}</td>
+                            <td>${item.uniqueUsers || 0}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="3">No data available</td></tr>'
+            }
+        </tbody>
+    </table>
+
+    <h3>Click by Device</h3>
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>Device Type</th>
+                <th>Total Clicks</th>
+                <th>Unique Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${
+                Array.isArray(data.clickDeviceTypeCount)
+                    ? data.clickDeviceTypeCount.map(item => `
+                        <tr>
+                            <td>${item.deviceType || 'N/A'}</td>
+                            <td>${item.totalClicks || 0}</td>
+                            <td>${item.uniqueUsers || 0}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="3">No data available</td></tr>'
+            }
+        </tbody>
+    </table>
+`;
+
+    $('#analyticsResult').html(html);
+}
+
+    });
+</script>

@@ -1,26 +1,53 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="./css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <nav>
-    <header>
-      <a href="/">
-        <span>Short & Sweet</span>
-        <span class="quote">- That's what she said</span>
-      </a>
-  </header>
-    <ul>
-      <%
-      if(user) { %>
-        <li>Welcome, <%= user.given_name%> <%= user.family_name %></li>
-        <li><a href="/logout">Log out</a></li>
-      <% } else { %>
-        <li><a href="/login">Log in</a></li>
-      <% } %>
-    </ul>
-  </nav>
-  
+    <nav>
+      <header>
+        <!-- Left Content (Short & Sweet + Quote) -->
+        <div class="left-content">
+          
+          <button class="sidebar-toggle" id="toggle-btn">☰</button>
+            <span>Short & Sweet</span>
+            <span class="quote">- That's what she said</span>
+        </div>
+
+        <!-- Right Content (Login/Logout) -->
+        <div class="right-content">
+            <ul>
+                <% if(user) { %>
+                    <li>Welcome, <%= user.given_name%> <%= user.family_name %></li>
+                    <li><a href="/logout">Log out</a></li>
+                <% } else { %>
+                    <li><a href="/login">Log in</a></li>
+                <% } %>
+            </ul>
+        </div>
+    </header>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <a href="/" class="sidebar-link">Home</a>
+                <a href="/profile" class="sidebar-link">Profile</a>
+                <a href="/api/manage_urls" class="sidebar-link">My Links</a>
+                <h3 class="sidebar-heading">Analytics</h3>
+                <a href="/api/urls" class="sidebar-link">- Urls</a>
+                <a href="/api/analytics" class="sidebar-link">- Topics</a>
+                <a href="/api/analytics/overall/<%-user.google_id%>" class="sidebar-link">- Overview</a>
+            </div>
+        </div>
+    </nav>
+    
+    <script>
+        $(document).ready(function() {
+            $('#toggle-btn').click(function() {
+                $('#sidebar').toggleClass('open');
+            });
+        });
+    </script>
+</body>
+</html>

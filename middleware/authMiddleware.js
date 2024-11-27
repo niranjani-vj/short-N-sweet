@@ -10,7 +10,6 @@ if (!jwt) {
 }
 const requireAuth = (req, res, next) => {
   const token = req.cookies.jwt;
-  console.log('user-req::', token);
 
   // check json web token exists & is verified
   if (token) {
@@ -19,7 +18,6 @@ const requireAuth = (req, res, next) => {
         console.log(err.message);
         res.redirect('/login');
       } else {
-        console.log(decodedToken);
         next();
       }
     });
