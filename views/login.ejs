@@ -1,45 +1,38 @@
 <%- include('partials/header'); -%>
 
-  <div id="g_id_onload"
-       data-client_id="<%= googleClientId %>"
-       data-callback="handleCredentialResponse">
-  </div>
+<div id="g_id_onload" data-client_id="<%= googleClientId %>" data-callback="handleCredentialResponse"></div>
 
-  <div class="g_id_signin"
-  data-type="standard"
-  data-shape="rectangular"
-  data-theme="outline"
-  data-text="signin_with"
-  data-size="large"
-  data-logo_alignment="left">
+<div class="g_id_signin"
+    data-type="standard"
+    data-shape="rectangular"
+    data-theme="outline"
+    data-text="signin_with"
+    data-size="large"
+    data-logo_alignment="left">
 </div>
 
 <%- include('partials/footer'); -%>
 
-
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
-  console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID);
-  async function handleCredentialResponse(response) {
-      console.log("Encoded JWT ID token: " + response.credential);
-      const token = response.credential;
+    async function handleCredentialResponse(response) {
+        const token = response.credential;
 
-    try {
-      const res = await fetch("/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
-      const data = await res.json();
-      if (data.user) {
-        window.location.href = '/'; 
-      } else {
-        console.error("Authentication failed:", data.error);
-      }
-    } catch (error) {
-      console.error("Error:", error);
+        try {
+            const res = await fetch("/auth/google", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token }),
+            });
+            const data = await res.json();
+            if (data.user) {
+                window.location.href = '/';
+            } else {
+                console.error("Authentication failed:", data.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
     }
-  }
-  
 </script>

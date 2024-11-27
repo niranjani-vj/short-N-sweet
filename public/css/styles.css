@@ -1,231 +1,493 @@
-/* google fonts */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-
-body{
-  margin: 20px 40px;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-  background: #9189da;
-}
-h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
+/* Apply new font and background color */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
   font-family: 'Quicksand', sans-serif;
-  color: #0b0b0b;
+  background-color: #9189da; /* New background color */
+  color: #333;
+  height: 100%;
 }
-ul{
-  list-style-type: none;
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+  margin: 50px;
 }
-a{
-  text-decoration: none;
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 250px;
+  background-color: #333;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  padding-top: 20px;
 }
-nav{
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar .sidebar-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: -10px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
 }
-nav ul{
+
+.sidebar .sidebar-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
+  margin: 5px 0;
+  display: block;
+}
+
+.sidebar .sidebar-link:hover {
+  background-color: #444;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between; /* Ensures space between left and right content */
+  align-items: center;
+  padding: 20px;
+  background-color: #192331;
+  color: #fff;
+  font-size: 1.0em; /* Larger header */
+}
+
+/* Left Content (Sidebar toggle + Short & Sweet + Quote) */
+.left-content {
   display: flex;
   align-items: center;
 }
-nav li{
-  margin-left: 20px;
+
+.sidebar-toggle {
+  font-size: 1.5em;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 10px;
 }
-nav li a{
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.8em;
-  display: block;
-  padding: 10px 16px;
-  letter-spacing: 2px;
-}
-.btn{
-  border-radius: 36px;
-  background: #FEE996;
-}
-form h2{
-  font-size: 2.4em;
-  font-weight: 900;
-  margin-bottom: 40px;
-}
-form{
-  width: 360px;
-  margin: 0 auto;
-  padding: 30px;
-  box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
-  border-radius: 10px;
-  background: white;
-}
-input{
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  font-size: 1em;
-  width: 100%;
-}
-label{
-  display: block;
-  margin: 20px 0 10px;
-}
-button{
-  margin-top: 30px;
-  border-radius: 36px;
-  background: #FEE996;
-  border:0;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.8em;
-  display: block;
-  padding: 10px 16px;
-  letter-spacing: 2px;
-}
-.error{
-  color: #ff0099;
-  margin: 10px 2px;
-  font-size: 0.8em;
+
+.sidebar-heading {
+  font-size: 18px;
   font-weight: bold;
-}
-header .btn{
-  margin-top: 20px;
-  padding: 12px 18px;
-  text-transform: uppercase;
-  font-weight: bold;
-  display: inline-block;
-  font-size: 0.8em;
-}
-.profile {
-  margin-top: 2em;
-  text-align: center;
+  color: #fefdfd;
+  margin: 10px 0 5px 15px;
+  padding: 0;
 }
 
-.profile-pic {
-  border-radius: 50%;
-  margin-bottom: 1em;
-  width: 180px;
-  height: 170px;
-
-}
-
-.profile-info h3, .profile-info p {
-  margin: 0.5em 0;
-}
-
-footer{
-  text-align: center;
-  margin-top: 120px;
-  color: #aaa;
-}
-
-/* Flex layout for first name and last name */
-.row {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px; /* Adjust spacing if necessary */
-  margin-bottom: 0px;
-}
-
-/* Ensures both firstName and lastName inputs are on the same row */
-.input-group {
+.text-content {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  text-align: left; /* Align text to the left */
 }
 
-/* DOB field gets its own row */
-.input-group {
-  margin-bottom: -20px; /* Space between fields */
+ .quote {
+  font-size: 0.8em;
+  font-style: italic;
+  color: #f0f0f0;
+  margin-left: 10px;
+  margin-top: 5px; /* Slightly smaller space between Short & Sweet and the Quote */
 }
 
+/* Right Content (Login/Logout) */
+.right-content {
+  display: flex;
+  align-items: center;
+}
+
+.right-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.right-content ul li {
+  margin-left: 20px;
+}
+
+.right-content ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.1em;
+}
+
+.right-content ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Content Styling */
+.content {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.url-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.shorten-btn {
+  background-color: #192331;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1em;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.shorten-btn:hover {
+  background-color: #392672;
+}
+
+/* Profile Styling */
+.profile {
+  text-align: center;
+  margin: 20px;
+}
+
+.profile-info img {
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 10px;
+}
+
+.profile-info h3 {
+  font-size: 1.5em;
+  margin: 10px 0;
+}
+
+/* Google Sign-In Button */
 .g_id_signin {
-  width: 300px;
-  height: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 12px;
+  text-align: center;
+  background-color: #192331;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .g_id_signin:hover {
-  background-color: #ebeaef;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  background-color: #392672;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .sidebar {
+      width: 200px;
+  }
+
+  .g_id_signin {
+      font-size: 14px;
+  }
+
+  .content {
+      padding: 10px;
+  }
+
+  header .quote {
+      font-size: 0.9em;
+      font-style: italic;
+      margin-top: 5px; /* Slightly smaller space for mobile */
+  }
+
+  .url-input, .shorten-btn {
+      font-size: 14px;
+  }
+}
+/* Modal Background */
+.modal {
+  display: none; /* Initially hidden */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto; /* Center the modal vertically */
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px; /* Limit the width */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Styling for Login Content */
+.g_id_signin {
+  margin: 60px auto;
+  display: block;
+  text-align: center;
+}
+
+footer {
+  position: absolute;
+  bottom: 10px; /* Distance from the bottom of the page */
+  width: 50%;   /* Define the width of the footer */
+  left: 50%;    /* Move the footer's left edge to the middle of the page */
+  transform: translateX(-50%); /* Center the footer by shifting it left by half its width */
+  text-align: center; /* Center-align the text inside the footer */
+}
+/* General styling for the analytics page */
+.analytics {
+  max-width: 625px;
+  margin: 50px auto;  /* Center the section horizontally */
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.analytics h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.analytics h3 {
+  font-size: 1.5rem;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.analytics-table {
+  width: 100%;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.analytics-table th, .analytics-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.analytics-table th {
+  background-color: #392672;
+  color: white;
+  text-align: center;
+}
+
+.analytics-table td {
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.analytics-table tr:nth-child(even) td {
+  background-color: #f2f2f2;
+}
+
+.analytics-table tr:hover td {
+  background-color: #f1f1f1;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .analytics {
+      padding: 20px;
+  }
+
+  .analytics h2 {
+      font-size: 1.8rem;
+  }
+
+  .analytics-content p, .analytics-content h3 {
+      font-size: 1rem;
+  }
+
+  .analytics-table th, .analytics-table td {
+      font-size: 0.9rem;
+  }
+}
+
+/* Table Styles */
+.table-container {
+  margin-bottom: 40px;
+  color: #140d0d;
+}
+
+.links-table {
+  width: 85%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  margin-left: 135px;
+}
+
+.links-table th, .links-table td {
+  padding: 15px;
+  text-align: left;
+  border: 1px solid #080808;
+  font-size: 14px;
+  color: #000 ;
+}
+
+.links-table th {
+  background-color: #392672;
+  color: #fffffff8;
+}
+
+.links-table td {
+  background-color: #ffffff06;
+}
+
+.links-table td input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #cccccc0c;
+}
+
+.links-table td input:focus {
+  border-color: #392672;
+  outline: none;
+}
+
+.links-table tr:nth-child(even) {
+  background-color: #f9f9f908;
+}
+
+/* .links-table tr:hover {
+  background-color: #392672;
+} */
+
+.links-table td button {
+  margin-right: 5px;
+}
+
+/* Hover Effects for Buttons */
+.links-table .btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.g_id_signin span {
-  font-family: 'Arial', sans-serif;
+.links-table .btn:hover {
+  transform: scale(1.05);
+}
+
+/* Update Button */
+.update-btn {
+  background-color: #e3e398;
+  color: #070707;
+  width: 80px;
+  height: 35px;
+}
+
+.update-btn:hover {
+  background-color: #e0a800;
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #dc3545;
+  color: #040404;
+  width: 80px;
+  height: 35px;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Container for the result and the copy button */
+#result-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Style for the result paragraph */
+#result {
   font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
   font-weight: bold;
-  color: #555;
 }
 
-.g_id_signin img {
-  display: none;
-}
-
-header a {
-  font-size: 24px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-header .quote {
-  font-size: 14px;
-  font-style: italic;
-  color: #555;
-  margin-left:15px;
-}
-footer {
-  margin-top: 40px;
-  font-size: 14px;
-  color: #777;
-}
-.url-input {
-  padding: 10px;
-  width: 80%;
-  max-width: 400px;
-  margin-bottom: 20px;
-}
-.shorten-btn {
+/* Style for the copy button */
+#copyBtn {
   padding: 10px 20px;
   font-size: 16px;
-  cursor: pointer;
   background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
-}
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 70px;
-  margin-left: 500;
-  width: 500px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-
-#popup {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid #ccc;
-  padding: 20px;
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+/* Hover effect for the copy button */
+#copyBtn:hover {
+  background-color: #45a049;
 }
-#overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+
+/* After copying, button changes to indicate success */
+#copyBtn.copied {
+  background-color: #00c851;
+}
+
+/* Message displayed when the URL is copied */
+#copyBtn.copied::after {
+  content: " Copied!";
+  font-weight: bold;
 }

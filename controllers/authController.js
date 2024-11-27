@@ -74,8 +74,6 @@ module.exports.logout_get = (req, res) => {
 
 module.exports.google_login = async (req, res) => {
   const { token } = req.body;
- console.log('req.body::',req.body);
- console.log('tokenn::',token);
 
   try {
     // Verify the token
@@ -85,16 +83,13 @@ module.exports.google_login = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    console.log('payload::',payload);
     // Extract user information
     const { sub, email, given_name,family_name, picture } = payload;
     const password = 'password123'
     // Check if user exists in the database
     let user = await User.findOne({ google_id: sub });
-    console.log('user::',user);
     if (!user) {
       const user = await User.create({google_id:sub, email, given_name,family_name,picture });
-      console.log('Created-user::',user);
 
       const token = createToken(user._id);
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });

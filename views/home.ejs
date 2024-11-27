@@ -1,21 +1,22 @@
 <%- include('partials/header'); -%>
 
-<header>
- 
-  <div class="content">
+<div class="content">
     <input type="text" id="longUrl" class="url-input" placeholder="Enter the URL to shorten">
     <input type="text" id="customAlias" class="url-input" placeholder="Enter any custom alias (Optional)">
     <input type="text" id="topic" class="url-input" placeholder="Enter the topic">
     <button class="shorten-btn">Shorten URL</button>
-    <p id="result"></p>
+    <div id="result-container">
+      <p id="result"></p>
+      <button id="copyBtn">Copy</button>
   </div>
-
-
+</div>
 
 <%- include('partials/footer'); -%>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
+
     $('.shorten-btn').on('click', function () {
 
       const urlInput = $('#longUrl').val();
@@ -25,6 +26,7 @@
         alert('Please enter a URL');
         return;
       }
+      let shortenedUrl = '';
 
       $.ajax({
         url: '/api/shorten',
@@ -32,8 +34,10 @@
         contentType: 'application/json',
         data: JSON.stringify({ longUrl: urlInput,customAlias:customInput,topic:topicInput }),
         success: function (response) {
-          $('#result').text(`Shortened URL: https://shortandsweet.onrender.com/api/shorten/${response.shortUrl}`);
-          
+          shortenedUrl = response.shortUrl;
+          $('#result').text(`Shortened URL: https://shortandsweet.onrender.com/api/shorten/${shortenedUrl}`);
+           // Show the copy button
+          $('#copyBtn').show();
         },
         error: function (xhr, status, error) {
             if (xhr.status === 401) {
@@ -45,6 +49,28 @@
             }
         },
       });
+      $('#copyBtn').on('click', function () {
+        // Ensure there's a valid shortUrl
+        if (!shortenedUrl) {
+            alert('No shortened URL found!');
+            return;
+        }
+  
+        // Try using the Clipboard API
+        navigator.clipboard.writeText(`https://shortandsweet.onrender.com/api/shorten/${shortenedUrl}`).then(function () {
+            
+            // Change the button text to 'Copied!' and revert after 2 seconds
+            const originalText = $('#copyBtn').text();
+            $('#copyBtn').text('Copied!');
+            setTimeout(function () {
+                $('#copyBtn').text(originalText);
+            }, 2000);
+        }).catch(function (err) {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy the URL.');
+        });
+      });
     });
+
   });
 </script>
